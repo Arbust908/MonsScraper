@@ -1,0 +1,24 @@
+{
+  "name": "pb-monscrap",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arbust908/MonsScraper.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Arbust908/MonsScraper/issues"
+  },
+  "homepage": "https://github.com/Arbust908/MonsScraper#readme",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "puppeteer": "^2.0.0",
+    "slugify": "^1.3.6"
+  }
+}
