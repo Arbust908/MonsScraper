@@ -50,7 +50,10 @@ const createFolder = (name) => {
                         case 5:
                             var types = '';
                             types = item.innerHTML.split('src=')[1];
-                            types = types ? types.split('"')[1] : 'No Tengo';
+                            if(types) {
+                                pkmn.noty = types.length;
+                                types = types.split('"')[1];
+                            }
                             pkmn.type = types;
                         case 6:
                             pkmn.hp = item.innerText;
