@@ -10,11 +10,26 @@ const createFolder = (name) => {
     return 'Existed!';
 }
 
+const getFileName = (url) => {
+    console.log(url);
+    url = url.split('/');
+    console.log(url);
+    url = url[ (url.length) -1 ];
+    console.log(url);
+    return url;
+}
+const saveImage = (fileUrl, dir) => {
+    var viewSource = page.goto(fileUrl);
+    fs.writeFileSync(dir , viewSource.buffer());
+    return 'Done!';
+}
+
 (async () => {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    const url = 'https://www.serebii.net/swordshield/galarpokedex.shtml';
-    await page.goto(url, { waitUntil: 'networkidle2' });
+    const url = 'https://www.serebii.net';
+    const tablePage = '/swordshield/galarpokedex.shtml';
+    await page.goto(url+tablePage, { waitUntil: 'networkidle2' });
     createFolder('./serebii');
     await page.setViewport({ width: 1920, height: 1070 });
     await page.screenshot({path: './serebii/index.png', fullPage: true});
@@ -96,16 +111,16 @@ const createFolder = (name) => {
         }
         return pkmns;
     });
-
-    console.log('pokemon', pkmns);
+    // console.log('pokemon', pkmns);
 
     console.log('---< o >---');
 
     const pkmnsJson = JSON.stringify(pkmns);
     fs.writeFileSync('./serebii/pokes.json', pkmnsJson);
     console.log('Escribimos');
-    pkmns.forEach( pkmn  => {
-        let dirName = slugify(pkmn.no);
+    for (let xx = 0; xx < pkmns.length; xx++) {
+        const pkmn = pkmns[xx];
+         let dirName = slugify(pkmn.no);
         createFolder('./serebii/'+ dirName );
         fs.writeFile(
             './serebii/'+ dirName +'/'+ dirName +'.json',
@@ -113,9 +128,42 @@ const createFolder = (name) => {
             (err) => {
                 if (err) console.log('Error writing file:', err)
             }
-        )
-    });
+        );
+        console.log( getFileName(pkmn.img) );
+        let imageFileUrl = './serebii/'+ dirName + '/' + getFileName(pkmn.img);
+        var viewSource = await page.goto(url + pkmn.img);
+        fs.writeFileSync( imageFileUrl, await viewSource.buffer());
+        for (let i = 0; i < pkmn.types.length; i++) {
+            const type = pkmn.types[i];
+            let imageFileUrl = './serebii/'+ dirName +'/'+ getFileName(type);
+            var viewSource = await page.goto(url + type);
+            fs.writeFileSync( imageFileUrl, await viewSource.buffer());
+        }
+        console.log(pkmn.types);
+    };
 
+    for (let xx = 0; xx < pkmns.length; xx++) {
+        const pkmn = pkmns[xx];
+        if (xx === 1) {
+            console.log(pkmn);
+
+            const page = await browser.newPage();
+            const url = 'https://www.serebii.net';
+            const tablePage = pkmn.a;
+            await page.goto(url+tablePage, { waitUntil: 'networkidle2' });
+            await page.setViewport({ width: 1920, height: 1070 });
+            await page.screenshot({path: './serebii/'+pkmn.no+'/index.png', fullPage: true});
+            let datos = await page.$$eval( 'main>div.center', (info) => {
+                let data = info[1];
+                data = data.querySelectorAll('tr');
+                datos = [];
+                // ***
+                datos.push(data);
+                // ***
+                return datos;
+            });
+        }
+    };
     console.log('---< o >---');
     console.log('---< o >---');
     console.log('Terminado!');
